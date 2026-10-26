@@ -3,6 +3,8 @@
 **The open-source Android client for the [opencode](https://github.com/sst/opencode) AI coding agent.**
 AI-assisted coding from your phone — Android, via Google Play, F-Droid, or a direct APK.
 
+> **Status (Oct 2026): not actively maintained.** The app works against opencode v1 servers; opencode 2 compatibility is unconfirmed (see issues #205 and #219). No paid OpenCode Connect relay will ship. The code stays open-source under MIT; community PRs are welcome, but no release timeline is promised.
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![F-Droid repo](https://img.shields.io/badge/F--Droid-add_our_repo-1976D2?logo=f-droid)](https://dzianisv.github.io/opencode-mobile/fdroid/repo)
 [![Download APK](https://img.shields.io/badge/Download-APK-green?logo=android)](https://github.com/dzianisv/opencode-mobile/releases/latest)
