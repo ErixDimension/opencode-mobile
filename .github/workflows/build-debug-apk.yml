@@ -47,6 +47,38 @@ jobs:
         run: npm install --legacy-peer-deps
       - name: Generate Android project
         run: npx expo prebuild --platform android --no-install
+      - name: Install Android NDK with retry
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
+          if [ -z "$SDK" ]; then
+            echo "Android SDK path tidak ditemukan"
+            exit 1
+          fi
+
+          for attempt in 1 2 3; do
+            echo "NDK install attempt $attempt/3"
+            rm -rf "$SDK/ndk/27.1.12297006"
+
+            if yes | sdkmanager --licenses >/dev/null 2>&1 || true; then
+              :
+            fi
+
+            if sdkmanager --install "ndk;27.1.12297006" --verbose; then
+              if [ -f "$SDK/ndk/27.1.12297006/source.properties" ]; then
+                echo "NDK terpasang dan source.properties ditemukan."
+                exit 0
+              fi
+            fi
+
+            echo "Instalasi NDK gagal pada percobaan $attempt."
+            sleep 5
+          done
+
+          echo "NDK gagal dipasang setelah 3 percobaan."
+          exit 1
+
       - name: Build debug APK
         working-directory: android
         run: ./gradlew assembleDebug --no-daemon
