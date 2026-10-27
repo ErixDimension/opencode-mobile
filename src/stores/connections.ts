@@ -6,6 +6,7 @@ import { createClient, type Client, type Project } from "../lib/sdk"
 import { addBreadcrumb } from "../lib/sentry"
 import { AnalyticsEvent, classifyConnectionError, track, type ConnectionTestSource } from "../lib/analytics"
 import { buildAuth } from "../lib/auth"
+import { resolveConnectionPassword } from "../lib/connection-password"
 import { stripTrailingSlash } from "../lib/path-utils"
 
 const CONNECTIONS_KEY = "opencode_connections"
@@ -260,10 +261,18 @@ export const useConnections = create<ConnectionsState>((set, get) => ({
   testConnection: async (connection, source, password) => {
     track(AnalyticsEvent.ConnectionAttempted, { source })
     try {
+      // Blank edit password means reuse the credential saved for this connection.
+      const effectivePassword = await resolveConnectionPassword(
+        connection.id,
+        password,
+        (key) => SecureStore.getItemAsync(key),
+        PASSWORDS_PREFIX,
+      )
+
       const client = createClient({
         baseUrl: connection.url,
         directory: connection.directory,
-        auth: buildAuth(connection.username, password),
+        auth: buildAuth(connection.username, effectivePassword),
       })
 
       await client.global.health(CONNECTION_TEST_TIMEOUT_MS)
